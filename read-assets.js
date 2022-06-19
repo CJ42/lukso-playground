@@ -1,24 +1,28 @@
 // Import and Network Setup
+require("isomorphic-fetch");
 const Web3 = require("web3");
 const { ERC725: ERC725JS } = require("@erc725/erc725.js");
 const { ERC725Y_INTERFACE_IDS } = require("@erc725/erc725.js/build/main/src/lib/constants");
-require("isomorphic-fetch");
+
+// contract ABIs
+const LSP4 = require("@lukso/lsp-smart-contracts/artifacts/LSP4DigitalAssetMetadata.json");
+const LSP8 = require("@lukso/lsp-smart-contracts/artifacts/LSP8IdentifiableDigitalAsset.json");
+
+// ERC725Y JSON Schemas
+const LSP4schema = require("@erc725/erc725.js/schemas/LSP4DigitalAsset.json");
+const UniversalProfileSchema = require("@erc725/erc725.js/schemas/LSP3UniversalProfileMetadata.json");
 
 // Our static variables
 const SAMPLE_PROFILE_ADDRESS = "0x0Ac71c67Fa5E4c9d4af4f99d7Ad6132936C2d6A3";
+const SAMPLE_ASSET_ADDRESS = "0xfE85568Fea15A7ED3c56F7ca6544F2b96Aeb1774";
+
+// endpoints
 const RPC_ENDPOINT = "https://rpc.l14.lukso.network";
 const IPFS_GATEWAY_URL = "https://cloudflare-ipfs.com/ipfs/";
 
 // Parameters for ERC725 Instance
-const erc725schema = require("@erc725/erc725.js/schemas/LSP3UniversalProfileMetadata.json");
-const provider = new Web3.providers.HttpProvider(RPC_ENDPOINT);
+const web3 = new Web3(RPC_ENDPOINT);
 const config = { ipfsGateway: IPFS_GATEWAY_URL };
-
-// ABI for the asset
-const LSP4 = require("@lukso/lsp-smart-contracts/artifacts/LSP4DigitalAssetMetadata.json");
-const LSP8 = require("@lukso/lsp-smart-contracts/artifacts/LSP8IdentifiableDigitalAsset.json");
-
-const web3 = new Web3("https://rpc.l14.lukso.network");
 
 /*
  * Step 1
@@ -30,7 +34,7 @@ const web3 = new Web3("https://rpc.l14.lukso.network");
 async function fetchReceivedAssets(universalProfileAddress) {
   try {
     // instance for the universal Profile
-    const profile = new ERC725JS(erc725schema, universalProfileAddress, provider, config);
+    const profile = new ERC725JS(UniversalProfileSchema, universalProfileAddress, web3._provider, config);
 
     const result = await profile.fetchData("LSP5ReceivedAssets[]");
     return result.value;
@@ -40,14 +44,16 @@ async function fetchReceivedAssets(universalProfileAddress) {
 }
 
 /*
+ * Step 2
+ *
+ * @deprecated
+ *
  * Return array of blockchain addresses
  * of assets that are owned by the
  * Univeral Profile.
  *
  * @param owner Universal Profile address
  * @return address[] of owned assets
- *
- * @deprecated
  */
 async function fetchOwnedAssets(owner) {
   const digitalAssets = await fetchReceivedAssets(SAMPLE_PROFILE_ADDRESS);
@@ -65,9 +71,8 @@ async function fetchOwnedAssets(owner) {
   return ownedAssets;
 }
 
-const SAMPLE_ASSET_ADDRESS = "0xfE85568Fea15A7ED3c56F7ca6544F2b96Aeb1774";
-
 /*
+ * Step 3
  * Check the ERC725Y interface of an asset's smart contract
  *
  * @param assetAddress address of digital asset smart contract
@@ -90,13 +95,8 @@ async function checkErc725YInterfaceId(assetAddress) {
   return interfaceCheck;
 }
 
-// ...
-// ABI's
-// use LSP4Metadata artifact for this
-const ERC725Y = require("@erc725/smart-contracts/artifacts/ERC725Y.json");
-const LSP4schema = require("@erc725/erc725.js/schemas/LSP4DigitalAsset.json");
-
 /*
+ * Step 4
  * Fetch the dataset of an asset
  *
  * @param key of asset property
@@ -104,8 +104,8 @@ const LSP4schema = require("@erc725/erc725.js/schemas/LSP4DigitalAsset.json");
  */
 async function getAssetData(key) {
   try {
-    // Instantiate ERC725Y smart contract
-    const digitalAsset = new web3.eth.Contract(ERC725Y.abi, SAMPLE_ASSET_ADDRESS);
+    // Instantiate Digital Asset smart contract
+    const digitalAsset = new web3.eth.Contract(LSP4.abi, SAMPLE_ASSET_ADDRESS);
 
     // Fetch the encoded contract data
     return await digitalAsset.methods["getData(bytes32)"](key).call();
@@ -115,6 +115,7 @@ async function getAssetData(key) {
 }
 
 /*
+ * Step 5
  * Decode value from ERC725Y storage
  * based on it's key and phrase
  *
@@ -122,13 +123,12 @@ async function getAssetData(key) {
  * @param decodePhrase string of fetchable content
  * @return string of decoded data
  */
-async function decodeData(keyName, encodedData) {
+async function decodeAssetData(keyName, encodedData) {
   try {
-    // Instance of the LSP4 with ERC725.js
-    // instance for the digital asset
-    const erc725 = new ERC725JS(LSP4schema, SAMPLE_ASSET_ADDRESS, provider, config);
+    // instance for the digital asset with erc725.js
+    const digitalAsset = new ERC725JS(LSP4schema, SAMPLE_ASSET_ADDRESS, web3._provider, config);
     // Decode the assets data
-    return erc725.decodeData({
+    return digitalAsset.decodeData({
       keyName: keyName,
       value: encodedData,
     });
@@ -138,6 +138,7 @@ async function decodeData(keyName, encodedData) {
 }
 
 /*
+ * Step 6
  * Create a fetchable link for the asset data
  * that was embeded into the JSON metadata
  *
@@ -153,6 +154,7 @@ async function getMetaDataLink(decodedAssetMetadata) {
 }
 
 /*
+ * Step 7
  * Fetch the asset data from a link
  *
  * @return string with asset data as JSON
@@ -187,7 +189,7 @@ async function main() {
   console.log(encodedAssetData);
 
   console.log("step 5 -----");
-  const decodedAssetData = await decodeData(MetaDataKey.name, encodedAssetData);
+  const decodedAssetData = await decodeAssetData(MetaDataKey.name, encodedAssetData);
   console.log(decodedAssetData);
 
   console.log("step 6 ---");
