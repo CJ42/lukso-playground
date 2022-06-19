@@ -22,7 +22,8 @@
     "chai": "^4.3.6",
     "ethereum-waffle": "^3.4.4",
     "ethers": "^5.6.8",
-    "hardhat": "^2.9.7"
+    "hardhat": "^2.9.7",
+    "ts-node": "^10.8.1"
   },
   "dependencies": {
     "@erc725/erc725.js": "^0.14.1",
