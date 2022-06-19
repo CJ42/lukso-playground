@@ -34,7 +34,7 @@ const config = { ipfsGateway: IPFS_GATEWAY_URL };
 async function fetchReceivedAssets(universalProfileAddress) {
   try {
     // instance for the universal Profile
-    const profile = new ERC725JS(UniversalProfileSchema, universalProfileAddress, web3._provider, config);
+    const profile = new ERC725JS(UniversalProfileSchema, universalProfileAddress, web3.currentProvider, config);
 
     const result = await profile.fetchData("LSP5ReceivedAssets[]");
     return result.value;
@@ -126,7 +126,7 @@ async function getAssetData(key) {
 async function decodeAssetData(keyName, encodedData) {
   try {
     // instance for the digital asset with erc725.js
-    const digitalAsset = new ERC725JS(LSP4schema, SAMPLE_ASSET_ADDRESS, web3._provider, config);
+    const digitalAsset = new ERC725JS(LSP4schema, SAMPLE_ASSET_ADDRESS, web3.currentProvider, config);
     // Decode the assets data
     return digitalAsset.decodeData({
       keyName: keyName,
