@@ -26,7 +26,10 @@
     "ts-node": "^10.8.1"
   },
   "dependencies": {
+    "@chainlink/contracts": "^0.4.1",
     "@erc725/erc725.js": "^0.14.1",
+    "@graphprotocol/contracts": "^1.12.0",
+    "@lukso/lsp-factory.js": "^2.3.1",
     "@lukso/lsp-smart-contracts": "^0.6.1",
     "isomorphic-fetch": "^3.0.0",
     "web3": "^1.7.3"
