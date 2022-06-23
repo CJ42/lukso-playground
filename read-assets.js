@@ -18,7 +18,7 @@ const SAMPLE_ASSET_ADDRESS = "0xfE85568Fea15A7ED3c56F7ca6544F2b96Aeb1774";
 
 // endpoints
 const RPC_ENDPOINT = "https://rpc.l14.lukso.network";
-const IPFS_GATEWAY_URL = "https://cloudflare-ipfs.com/ipfs/";
+const IPFS_GATEWAY_URL = "https://2eff.lukso.dev/ipfs";
 
 // Parameters for ERC725 Instance
 const web3 = new Web3(RPC_ENDPOINT);
@@ -147,7 +147,7 @@ async function decodeAssetData(keyName, encodedData) {
 async function getMetaDataLink(decodedAssetMetadata) {
   try {
     // Generate IPFS link from decoded metadata
-    return IPFS_GATEWAY_URL + decodedAssetMetadata.value.url.substring(7);
+    return IPFS_GATEWAY_URL + "/" + decodedAssetMetadata.value.url.substring(7);
   } catch (error) {
     console.log("URL could not be fetched");
   }
