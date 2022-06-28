@@ -34,5 +34,6 @@
     "@lukso/lsp-smart-contracts": "^0.6.1",
     "isomorphic-fetch": "^3.0.0",
     "web3": "^1.7.3"
-  }
+  },
+  "type": "module"
 }
