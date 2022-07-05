@@ -9,7 +9,7 @@ const myEOA = web3.eth.accounts.privateKeyToAccount(PRIVATE_KEY);
 
 // Step 3.2
 // Initialize the LSPFactory with the L14 RPC endpoint and your EOA's private key, which will deploy the UP smart contracts
-const lspFactory = new LSPFactory("https://rpc.l14.lukso.network", {
+const lspFactory = new LSPFactory("https://rpc.l16.lukso.network", {
   deployKey: PRIVATE_KEY,
   chainId: 22,
 });
