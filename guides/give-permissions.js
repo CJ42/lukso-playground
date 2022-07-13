@@ -6,7 +6,7 @@ const KeyManager = require("@lukso/lsp-smart-contracts/artifacts/LSP6KeyManager.
 const Web3 = require("web3");
 
 // setup
-const myUniversalProfileAddress = "0x4F81bFDD12c73c94222C7879C91c1B837b8adb62";
+const myUniversalProfileAddress = "0xC26508178c4D7d3Ad43Dcb9F9bb1fab9ceeD58B5";
 const RPC_ENDPOINT = "https://rpc.l16.lukso.network";
 
 const web3 = new Web3(RPC_ENDPOINT);
@@ -15,7 +15,7 @@ const erc725 = new ERC725(LSP6Schema);
 const PRIVATE_KEY = "0x..."; // add the private key of your EOA here (created in Step 1)
 const myEOA = web3.eth.accounts.wallet.add(PRIVATE_KEY);
 
-async function main() {
+async function grantPermissions() {
   // step 1 - create instance of UniversalProfile and KeyManager contracts
   const myUniversalProfile = new web3.eth.Contract(UniversalProfile.abi, myUniversalProfileAddress);
 
@@ -45,7 +45,10 @@ async function main() {
   });
 
   const result = await myUniversalProfile.methods["getData(bytes32)"](data.keys[0]).call();
-  console.log(`The beneficiary address ${beneficiaryAddress} has now the following permissions:`, result);
+  console.log(
+    `The beneficiary address ${beneficiaryAddress} has now the following permissions:`,
+    erc725.decodePermissions(result)
+  );
 }
 
-main();
+grantPermissions();
