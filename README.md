@@ -20,3 +20,7 @@ Learn how to deploy a Universal Profile using the _lsp-factory.js_. This will de
 - [x] [**How to give permission to another address to interact with your Universal Profile**](./guides/give-permissions.js)
 
 Learn how to write a basic script that gives the permission `SETDATA` to another `address` so that it can edit some data keys on your Universal Profile on your behalf.
+
+- [x] [**How to retrieve the list of addresses that have permission of the Universal PROFILE**](./guides/get-permissioned-addresses.js)
+
+Learn how to retrieve the list of addresses that have permissions on the Universal Profile, as well as decoding which permission they actually have.
